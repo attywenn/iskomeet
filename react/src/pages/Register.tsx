@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import * as api from '../lib/api'
-import type { GenderOption, UniversityOption, RegionOption } from '../lib/api'
 import { navigate } from '../lib/router'
+import { useGenders, useUniversities, useRegions } from '../lib/useQueries'
 
 export function RegisterPage() {
   const [step, setStep] = useState(1)
@@ -20,10 +20,10 @@ export function RegisterPage() {
   const [interests, setInterests] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
 
-  // Lookup data
-  const [genders, setGenders] = useState<GenderOption[]>([])
-  const [universities, setUniversities] = useState<UniversityOption[]>([])
-  const [regions, setRegions] = useState<RegionOption[]>([])
+  // Cached lookup data (cached across unmounts with 24h staleTime)
+  const { data: genders = [] } = useGenders()
+  const { data: universities = [] } = useUniversities()
+  const { data: regions = [] } = useRegions()
 
   const [error, setError] = useState('')
 
@@ -31,13 +31,6 @@ export function RegisterPage() {
   const [successModal, setSuccessModal] = useState(false)
   const [failModal, setFailModal] = useState(false)
   const [failMessage, setFailMessage] = useState('')
-
-  // Fetch reference data once
-  useEffect(() => {
-    api.fetchGenders().then(setGenders)
-    api.fetchUniversities().then(setUniversities)
-    api.fetchRegions().then(setRegions)
-  }, [])
 
   /*
    * ============================

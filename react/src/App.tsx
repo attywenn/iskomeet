@@ -3,6 +3,8 @@ import { PhoneShell } from './components/PhoneShell'
 import { useRoute } from './lib/router'
 import { SessionProvider } from './lib/session'
 import { useSession } from './lib/session'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/queryClient'
 import * as api from './lib/api'
 import { LandingPage } from './pages/Landing'
 import { MatchPage } from './pages/Match'
@@ -75,11 +77,13 @@ export default function App() {
   }, [])
 
   return (
-    <SessionProvider>
-      <PresenceSync />
-      <PhoneShell>
-        <Screen />
-      </PhoneShell>
-    </SessionProvider>
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider>
+        <PresenceSync />
+        <PhoneShell>
+          <Screen />
+        </PhoneShell>
+      </SessionProvider>
+    </QueryClientProvider>
   )
 }

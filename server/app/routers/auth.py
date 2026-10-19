@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models, schemas
 from app.security import verify_password, create_access_token, get_current_user
+from app.cache import profile_cache
 
 router = APIRouter()
 
@@ -66,6 +67,7 @@ def update_presence(
     current_user.last_active_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(current_user)
+    profile_cache.invalidate(current_user.user_id)
     return serialize_user_profile(current_user)
 
 

@@ -102,20 +102,54 @@ textarea {
 }
 
 @keyframes heart-burst {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(0.6); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-heart { animation: heart-burst 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+/* Swipe card animations */
+@keyframes swipe-left {
+  0%   { transform: translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateX(-130%) rotate(-22deg); opacity: 0; }
+}
+@keyframes swipe-right {
+  0%   { transform: translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateX(130%) rotate(22deg); opacity: 0; }
+}
+@keyframes swipe-up {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-120%) scale(0.9); opacity: 0; }
+}
+@keyframes card-enter {
+  0%   { transform: scale(0.92) translateY(12px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes stamp-in {
+  0%   { transform: scale(1.6) rotate(-12deg); opacity: 0; }
+  60%  { transform: scale(0.9) rotate(-12deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-12deg); opacity: 1; }
+}
+@keyframes stamp-in-right {
+  0%   { transform: scale(1.6) rotate(12deg); opacity: 0; }
+  60%  { transform: scale(0.9) rotate(12deg); opacity: 1; }
+  100% { transform: scale(1) rotate(12deg); opacity: 1; }
 }
 
-.animate-heart {
-  animation: heart-burst 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+.animate-swipe-left    { animation: swipe-left  0.42s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+.animate-swipe-right   { animation: swipe-right 0.42s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+.animate-swipe-up      { animation: swipe-up    0.38s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+.animate-card-enter    { animation: card-enter  0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-fadeIn        { animation: fadeIn       0.25s ease-out; }
+.animate-bounce-subtle { animation: bounce-subtle 2s ease-in-out infinite; }
+.animate-stamp-like    { animation: stamp-in-right 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-stamp-pass    { animation: stamp-in       0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+

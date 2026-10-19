@@ -1,4 +1,5 @@
 import type { ChatMessage, Conversation, ConversationSummary, Profile, SessionUser, UserProfile } from './types'
+export type { UserProfile }
 import { readJson, writeJson, removeKey } from './storage'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
@@ -215,12 +216,18 @@ export async function fetchRegions(): Promise<RegionOption[]> {
   return res.json()
 }
 
+export async function fetchUserProfile(userId: string | number): Promise<UserProfile | null> {
+  const res = await fetch(`${API_BASE}/users/${userId}`)
+  if (!res.ok) return null
+  return res.json()
+}
+
 export async function getProfiles(): Promise<Profile[]> {
   return []
 }
 
-export async function getProfile(_id: string): Promise<Profile | undefined> {
-  return undefined
+export async function getProfile(id: string): Promise<UserProfile | null> {
+  return fetchUserProfile(id)
 }
 
 export function getLikes(): string[] {

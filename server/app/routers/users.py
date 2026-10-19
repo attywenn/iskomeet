@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas
 from app.security import hash_password, get_current_user
+from app.cache import profile_cache
 
 router = APIRouter()
 
@@ -166,19 +167,58 @@ def list_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@router.get("/{user_id}", response_model=schemas.UserRead)
+@router.get("/{user_id}", response_model=schemas.UserProfile)
 def get_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    """Fetch user profile with in-memory LRU+TTL caching (5 minutes)."""
+    cached = profile_cache.get(user_id)
+    if cached is not None:
+        return cached
+
+    user = (
+        db.query(models.User)
+        .options(
+            joinedload(models.User.other_info).joinedload(models.UserOtherInfo.university),
+            joinedload(models.User.other_info).joinedload(models.UserOtherInfo.region),
+            joinedload(models.User.interests),
+            joinedload(models.User.looking_for_genders),
+        )
+        .filter(models.User.user_id == user_id)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+
+    oi = user.other_info
+    location = (
+        (oi.region.region_name if (oi and oi.region) else None)
+        or (oi.university.university_location if (oi and oi.university) else None)
+    )
+    profile = schemas.UserProfile(
+        user_id=user.user_id,
+        user_username=user.user_username,
+        first_name=oi.first_name if oi else "",
+        last_name=oi.last_name if oi else "",
+        gender=oi.gender.gender_name if (oi and oi.gender) else None,
+        gender_id=oi.gender_id if oi else None,
+        looking_for_genders=[g.gender_name for g in user.looking_for_genders] if user.looking_for_genders else [],
+        looking_for_gender_ids=[g.gender_id for g in user.looking_for_genders] if user.looking_for_genders else [],
+        university=oi.university.university_name if (oi and oi.university) else None,
+        location=location,
+        interests=[i.interests_name for i in user.interests] if user.interests else [],
+        is_dnd=user.is_dnd,
+        last_active_at=user.last_active_at,
+    )
+    profile_cache.set(user_id, profile)
+    return profile
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """Delete a user account and invalidate their cached profile."""
     user = db.query(models.User).filter(models.User.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    profile_cache.invalidate(user_id)
     db.delete(user)
     db.commit()
     return None
