@@ -1,6 +1,6 @@
 # Iskomeet -- A Filipino college dating platform
 
-- This is created as my Application Development (AppDev) course in my BS Computer Science program. 
+- This is created for our Application Development (AppDev) course in my BS Computer Science program. 
 
 ## WHAT IS THIS
 
@@ -10,6 +10,8 @@
     
 - Messaging, Liking
 - Swipe-left (Pass), Swipe-right (Like), Swipe-up (Super Like)
+
+> *Heavily utilized Agentic Engineering methods to build the fullstack application. Product of AI-orchestration.*
 
 
 ## More features coming soon!
